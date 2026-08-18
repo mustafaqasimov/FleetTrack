@@ -28,5 +28,5 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     @Builder.Default
-    Role role = Role.ROLE_USER;
+    Role role = Role.ROLE_FLEET_MANAGER;
 }
