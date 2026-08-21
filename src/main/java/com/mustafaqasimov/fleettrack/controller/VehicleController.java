@@ -1,5 +1,6 @@
 package com.mustafaqasimov.fleettrack.controller;
 
+import com.mustafaqasimov.fleettrack.dto.request.VehicleFilterRequest;
 import com.mustafaqasimov.fleettrack.dto.request.VehicleRequest;
 import com.mustafaqasimov.fleettrack.dto.response.VehicleResponse;
 import com.mustafaqasimov.fleettrack.service.VehicleService;
@@ -7,6 +8,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +54,15 @@ public class VehicleController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         vehicleService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Search vehicles with optional filters",
+            description = "Searches for vehicles based on optional filters")
+    @GetMapping
+    public Page<VehicleResponse> search(
+            @ModelAttribute VehicleFilterRequest filter,
+            @PageableDefault(size = 20) Pageable pageable
+    ) {
+        return vehicleService.search(filter, pageable);
     }
 }

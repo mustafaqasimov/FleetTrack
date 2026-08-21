@@ -1,5 +1,6 @@
 package com.mustafaqasimov.fleettrack.service;
 
+import com.mustafaqasimov.fleettrack.dto.request.VehicleFilterRequest;
 import com.mustafaqasimov.fleettrack.dto.request.VehicleRequest;
 import com.mustafaqasimov.fleettrack.dto.response.VehicleResponse;
 import com.mustafaqasimov.fleettrack.entity.Vehicle;
@@ -8,7 +9,10 @@ import com.mustafaqasimov.fleettrack.exception.error.ResourceAlreadyExistsExcept
 import com.mustafaqasimov.fleettrack.exception.error.ResourceNotFoundException;
 import com.mustafaqasimov.fleettrack.mapper.VehicleMapper;
 import com.mustafaqasimov.fleettrack.repository.VehicleRepository;
+import com.mustafaqasimov.fleettrack.specification.VehicleSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,6 +59,11 @@ public class VehicleService {
         Vehicle vehicle = findOrThrow(id);
         vehicle.setActive(ActiveStatus.INACTIVE);
         vehicleRepository.save(vehicle);
+    }
+
+    public Page<VehicleResponse> search(VehicleFilterRequest filter, Pageable pageable) {
+        return vehicleRepository.findAll(VehicleSpecification.withFilters(filter), pageable)
+                .map(vehicleMapper::toResponse);
     }
 
     private Vehicle findOrThrow(Long id) {
