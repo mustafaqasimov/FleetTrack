@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -43,4 +44,7 @@ public class Vehicle extends BaseEntity {
 
     @Column(name = "last_location_at")
     LocalDateTime lastLocationAt;
+
+    @Column(name = "next_service_due")
+    LocalDate nextServiceDue;
 }
