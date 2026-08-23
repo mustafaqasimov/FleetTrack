@@ -28,6 +28,10 @@ public class MaintenanceService {
 
         Maintenance maintenance = maintenanceMapper.toEntity(request);
         maintenance.setVehicle(vehicle);
+        maintenanceRepository.save(maintenance);
+
+        vehicle.setNextServiceDue(request.getServiceDate().plusMonths(3));
+        vehicleRepository.save(vehicle);
 
         return maintenanceMapper.toResponse(maintenanceRepository.save(maintenance));
     }

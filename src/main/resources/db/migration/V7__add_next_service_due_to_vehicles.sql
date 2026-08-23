@@ -1,0 +1,1 @@
+ALTER TABLE vehicles ADD COLUMN next_service_due DATE;

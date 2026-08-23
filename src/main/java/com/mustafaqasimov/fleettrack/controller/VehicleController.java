@@ -5,9 +5,15 @@ import com.mustafaqasimov.fleettrack.dto.request.VehicleRequest;
 import com.mustafaqasimov.fleettrack.dto.response.VehicleResponse;
 import com.mustafaqasimov.fleettrack.service.VehicleService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -26,30 +32,64 @@ public class VehicleController {
     private final VehicleService vehicleService;
 
     @Operation(summary = "Register a new vehicle", description = "Creates a new vehicle record")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "201", description = "Vehicle created successfully",
+                            content = @Content(schema = @Schema(implementation = VehicleResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid vehicle data",
+                            content = @Content(schema = @Schema(implementation = VehicleResponse.class)))
+            }
+    )
     @PostMapping
     public ResponseEntity<VehicleResponse> create(@Valid @RequestBody VehicleRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(vehicleService.create(request));
     }
 
     @Operation(summary = "Get a vehicle by id", description = "Retrieves a vehicle record by its ID")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Vehicle found",
+                            content = @Content(schema = @Schema(implementation = VehicleResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "Vehicle not found")
+            }
+    )
     @GetMapping("/{id}")
     public VehicleResponse getById(@PathVariable Long id) {
         return vehicleService.getById(id);
     }
 
     @Operation(summary = "List active vehicles", description = "Retrieves a list of all active vehicles")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Vehicles found",
+                            content = @Content(schema = @Schema(implementation = VehicleResponse.class)))
+            }
+    )
     @GetMapping
     public List<VehicleResponse> listActiveVehicles() {
         return vehicleService.listActiveVehicles();
     }
 
     @Operation(summary = "Update a vehicle", description = "Updates an existing vehicle record")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Vehicle updated successfully",
+                            content = @Content(schema = @Schema(implementation = VehicleResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "Vehicle not found")
+            }
+    )
     @PutMapping("/{id}")
     public VehicleResponse update(@PathVariable Long id, @Valid @RequestBody VehicleRequest request) {
         return vehicleService.update(id, request);
     }
 
     @Operation(summary = "Delete a vehicle", description = "Deletes a vehicle record by its ID")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Vehicle deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Vehicle not found")
+            }
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         vehicleService.delete(id);
@@ -58,10 +98,17 @@ public class VehicleController {
 
     @Operation(summary = "Search vehicles with optional filters",
             description = "Searches for vehicles based on optional filters")
-    @GetMapping
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Vehicles found",
+                            content = @Content(schema = @Schema(implementation = VehicleResponse.class)))
+            }
+    )
+    @GetMapping("/search")
+    @PageableAsQueryParam
     public Page<VehicleResponse> search(
             @ModelAttribute VehicleFilterRequest filter,
-            @PageableDefault(size = 20) Pageable pageable
+            @Parameter(hidden = true) @PageableDefault(page = 0, size = 10, sort = "id") Pageable pageable
     ) {
         return vehicleService.search(filter, pageable);
     }

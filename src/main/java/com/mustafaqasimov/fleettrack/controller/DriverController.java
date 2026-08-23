@@ -4,6 +4,8 @@ import com.mustafaqasimov.fleettrack.dto.request.DriverRequest;
 import com.mustafaqasimov.fleettrack.dto.response.DriverResponse;
 import com.mustafaqasimov.fleettrack.service.DriverService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +16,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/drivers")
 @RequiredArgsConstructor
-@Tag(name = "Drivers")
+@Tag(name = "Drivers", description = "Endpoints for managing driver records")
 public class DriverController {
 
     private final DriverService driverService;
 
-    @Operation(summary = "Register a new driver", description = "Creates a new driver record in the system")
+    @Operation(summary = "Register a new driver",
+            description = "Creates a new driver record in the system")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Driver registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body")
+    })
     @PostMapping
     public ResponseEntity<DriverResponse> create(@Valid @RequestBody DriverRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(driverService.create(request));
@@ -27,6 +34,10 @@ public class DriverController {
 
     @Operation(summary = "Get a driver by id",
             description = "Retrieves a driver record by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Driver found"),
+            @ApiResponse(responseCode = "404", description = "Driver not found")
+    })
     @GetMapping("/{id}")
     public DriverResponse getById(@PathVariable Long id) {
         return driverService.getById(id);
@@ -34,12 +45,21 @@ public class DriverController {
 
     @Operation(summary = "Update a driver",
             description = "Updates the information of an existing driver")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Driver updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body"),
+            @ApiResponse(responseCode = "404", description = "Driver not found")
+    })
     @PatchMapping("/{id}")
     public DriverResponse update(@PathVariable Long id, @Valid @RequestBody DriverRequest request) {
         return driverService.update(id, request);
     }
 
     @Operation(summary = "Delete a driver", description = "Removes a driver record from the system")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Driver deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Driver not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         driverService.delete(id);
@@ -48,6 +68,10 @@ public class DriverController {
 
     @Operation(summary = "Assign a vehicle to this driver",
             description = "Assigns a vehicle to the specified driver")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Vehicle assigned successfully"),
+            @ApiResponse(responseCode = "404", description = "Driver or vehicle not found")
+    })
     @PatchMapping("/{driverId}/assign-vehicle/{vehicleId}")
     public DriverResponse assignVehicle(@PathVariable Long driverId, @PathVariable Long vehicleId) {
         return driverService.assignVehicle(driverId, vehicleId);
@@ -55,6 +79,10 @@ public class DriverController {
 
     @Operation(summary = "Remove the vehicle assignment from this driver",
             description = "Removes the vehicle assignment from the specified driver")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Vehicle unassigned successfully"),
+            @ApiResponse(responseCode = "404", description = "Driver not found")
+    })
     @PatchMapping("/{driverId}/unassign-vehicle")
     public DriverResponse unassignVehicle(@PathVariable Long driverId) {
         return driverService.unassignVehicle(driverId);
