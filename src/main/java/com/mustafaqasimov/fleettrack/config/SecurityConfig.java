@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/maintenance/**").hasAnyRole("FLEET_MANAGER", "ADMIN")
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/location/**").hasAnyRole("FLEET_MANAGER", "ADMIN")
+                        .requestMatchers("/reports/**").hasAnyRole("FLEET_MANAGER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

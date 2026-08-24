@@ -2,11 +2,13 @@ package com.mustafaqasimov.fleettrack.repository;
 
 import com.mustafaqasimov.fleettrack.entity.Vehicle;
 import com.mustafaqasimov.fleettrack.enums.ActiveStatus;
+import com.mustafaqasimov.fleettrack.enums.VehicleStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +22,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpec
     boolean existsByLicensePlate(String licensePlate);
 
     List<Vehicle> findAllByNextServiceDueLessThanEqual(LocalDate date);
+
+    List<Vehicle> findAllByStatusNotAndLastLocationAtBefore(VehicleStatus status, LocalDateTime threshold);
 }

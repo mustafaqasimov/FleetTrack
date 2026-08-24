@@ -11,6 +11,8 @@ import com.mustafaqasimov.fleettrack.mapper.VehicleMapper;
 import com.mustafaqasimov.fleettrack.repository.VehicleRepository;
 import com.mustafaqasimov.fleettrack.specification.VehicleSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class VehicleService {
         return vehicleMapper.toResponse(vehicleRepository.save(vehicle));
     }
 
+    @Cacheable(value = "vehicles", key = "#id")
     public VehicleResponse getById(Long id) {
         return vehicleMapper.toResponse(findOrThrow(id));
     }
@@ -43,6 +46,7 @@ public class VehicleService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    @CacheEvict(value = "vehicles", key = "#id")
     public VehicleResponse update(Long id, VehicleRequest request) {
         Vehicle vehicle = findOrThrow(id);
 
@@ -55,6 +59,7 @@ public class VehicleService {
         return vehicleMapper.toResponse(vehicleRepository.save(vehicle));
     }
 
+    @CacheEvict(value = "vehicles", key = "#id")
     public void delete(Long id) {
         Vehicle vehicle = findOrThrow(id);
         vehicle.setActive(ActiveStatus.INACTIVE);
